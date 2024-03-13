@@ -76,14 +76,34 @@
         }
         #cart {
             display: none;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 20px;
+            margin-top: 20px;
+            background-color: #f8f9fa;
         }
         #cart-items {
             list-style-type: none;
             padding: 0;
         }
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .cart-item-remove {
+            color: #f72585;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        .cart-item-remove:hover {
+            color: #7209b7;
+        }
         #cart-total {
             font-size: 20px;
             margin-top: 10px;
+            text-align: right;
         }
     </style>
 </head>
@@ -146,9 +166,13 @@
             function updateCartDisplay() {
                 cartItemsList.innerHTML = '';
                 let total = 0;
-                cartItems.forEach(item => {
+                cartItems.forEach((item, index) => {
                     const li = document.createElement('li');
-                    li.textContent = `${item.name} - $${item.price.toFixed(2)}`;
+                    li.classList.add('cart-item');
+                    li.innerHTML = `
+                        <span>${item.name} - $${item.price.toFixed(2)}</span>
+                        <span class="cart-item-remove" data-index="${index}">Remove</span>
+                    `;
                     cartItemsList.appendChild(li);
                     total += item.price;
                 });
@@ -173,6 +197,16 @@
                     cartItems.push({ name, price });
                     cartButton.textContent = `Cart (${cartItems.length})`;
                 });
+            });
+
+            // Remove item from cart
+            cartItemsList.addEventListener('click', function(event) {
+                if (event.target.classList.contains('cart-item-remove')) {
+                    const index = parseInt(event.target.getAttribute('data-index'));
+                    cartItems.splice(index, 1);
+                    updateCartDisplay();
+                    cartButton.textContent = `Cart (${cartItems.length})`;
+                }
             });
         });
     </script>
