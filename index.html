@@ -163,10 +163,13 @@
     </div>
 
     <div id="payment-form" class="container">
-        <h2>Payment Details</h2>
-        <form id="payment-form">
-            <div id="card-element"><!-- Stripe Elements Placeholder --></div>
-            <button id="pay-button" class="button" type="button">Pay</button>
+        <!-- Stripe payment form can be added here -->
+        <form id="stripe-form">
+            <div id="card-element">
+                <!-- Elements will create input elements here -->
+            </div>
+            <button class="button" id="pay">Pay</button>
+            <div id="payment-result"></div>
         </form>
     </div>
 
@@ -180,15 +183,13 @@
             const addToCartButtons = document.querySelectorAll('.add-to-cart');
             const checkoutButton = document.getElementById('checkout');
             const paymentForm = document.getElementById('payment-form');
-            const payButton = document.getElementById('pay-button');
+            const payButton = document.getElementById('pay');
 
             let cartItems = [];
 
             // Stripe.js setup
             const stripe = Stripe('your_stripe_publishable_key');
             const elements = stripe.elements();
-            const cardElement = elements.create('card');
-            cardElement.mount('#card-element');
 
             // Update cart display
             function updateCartDisplay() {
@@ -246,28 +247,23 @@
             // Checkout button event listener
             checkoutButton.addEventListener('click', function() {
                 paymentForm.style.display = 'block'; // Show payment form
+                // Create a payment form using Stripe Elements
+                const cardElement = elements.create('card');
+                cardElement.mount('#card-element');
             });
 
             // Pay button event listener
-            payButton.addEventListener('click', function() {
-                // Trigger payment process using Stripe
-                stripe.confirmCardPayment('your_secret_payment_intent_client_secret', {
-                    payment_method: {
-                        card: cardElement,
-                    }
-                }).then(function(result) {
-                    if (result.error) {
-                        // Show error to your customer
-                        console.error(result.error.message);
-                    } else {
-                        // The payment succeeded
-                        if (result.paymentIntent.status === 'succeeded') {
-                            // Handle successful payment
-                            console.log('Payment succeeded:', result.paymentIntent);
-                            // Optionally, you can redirect to a success page or show a success message
-                        }
-                    }
+            payButton.addEventListener('click', async function() {
+                const { paymentMethod, error } = await stripe.createPaymentMethod({
+                    type: 'card',
+                    card: elements.getElement('card'),
                 });
+                if (error) {
+                    document.getElementById('payment-result').textContent = error.message;
+                } else {
+                    // Send the payment method ID to your server to complete the payment
+                    document.getElementById('payment-result').textContent = 'Payment successful!';
+                }
             });
         });
     </script>
