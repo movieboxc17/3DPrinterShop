@@ -109,15 +109,8 @@
             margin-top: 20px;
             text-align: right;
         }
-        .payment-methods {
+        #payment-form {
             display: none;
-            margin-top: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            padding: 20px;
-        }
-        .payment-method {
-            margin-bottom: 10px;
         }
     </style>
 </head>
@@ -167,20 +160,13 @@
         <div id="checkout-button">
             <button class="button" id="checkout">Checkout</button>
         </div>
-        <div class="payment-methods">
-            <div class="payment-method">
-                <input type="radio" name="payment-method" id="credit-card" value="credit-card">
-                <label for="credit-card">Credit Card</label>
-            </div>
-            <div class="payment-method">
-                <input type="radio" name="payment-method" id="paypal" value="paypal">
-                <label for="paypal">PayPal</label>
-            </div>
-            <!-- Add more payment methods here -->
-            <button class="button" id="confirm-payment">Confirm Payment</button>
-        </div>
     </div>
 
+    <div id="payment-form" class="container">
+        <!-- Stripe payment form can be added here -->
+    </div>
+
+    <script src="https://js.stripe.com/v3/"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const cartButton = document.getElementById('cart-button');
@@ -189,10 +175,13 @@
             const cartTotal = document.getElementById('cart-total');
             const addToCartButtons = document.querySelectorAll('.add-to-cart');
             const checkoutButton = document.getElementById('checkout');
-            const paymentMethods = document.querySelector('.payment-methods');
-            const confirmPaymentButton = document.getElementById('confirm-payment');
+            const paymentForm = document.getElementById('payment-form');
 
             let cartItems = [];
+
+            // Stripe.js setup
+            const stripe = Stripe('your_stripe_publishable_key');
+            const elements = stripe.elements();
 
             // Update cart display
             function updateCartDisplay() {
@@ -247,26 +236,12 @@
                 }
             });
 
-            // Checkout
+            // Checkout button event listener
             checkoutButton.addEventListener('click', function() {
-                paymentMethods.style.display = 'block';
-            });
-
-            // Confirm Payment
-            confirmPaymentButton.addEventListener('click', function() {
-                const selectedPaymentMethod = document.querySelector('input[name="payment-method"]:checked');
-                if (selectedPaymentMethod) {
-                    if (selectedPaymentMethod.value === 'credit-card') {
-                        // Perform credit card payment
-                        alert('Credit card payment successful!');
-                    } else if (selectedPaymentMethod.value === 'paypal') {
-                        // Perform PayPal payment
-                        alert('PayPal payment successful!');
-                    }
-                    // Additional actions related to payment confirmation can be added here
-                } else {
-                    alert('Please select a payment method.');
-                }
+                paymentForm.style.display = 'block'; // Show payment form
+                // Create a payment form using Stripe Elements
+                const cardElement = elements.create('card');
+                cardElement.mount('#payment-form');
             });
         });
     </script>
