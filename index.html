@@ -109,6 +109,16 @@
             margin-top: 20px;
             text-align: right;
         }
+        .payment-methods {
+            display: none;
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 20px;
+        }
+        .payment-method {
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
@@ -157,6 +167,18 @@
         <div id="checkout-button">
             <button class="button" id="checkout">Checkout</button>
         </div>
+        <div class="payment-methods">
+            <div class="payment-method">
+                <input type="radio" name="payment-method" id="credit-card" value="credit-card">
+                <label for="credit-card">Credit Card</label>
+            </div>
+            <div class="payment-method">
+                <input type="radio" name="payment-method" id="paypal" value="paypal">
+                <label for="paypal">PayPal</label>
+            </div>
+            <!-- Add more payment methods here -->
+            <button class="button" id="confirm-payment">Confirm Payment</button>
+        </div>
     </div>
 
     <script>
@@ -166,6 +188,9 @@
             const cartItemsList = document.getElementById('cart-items');
             const cartTotal = document.getElementById('cart-total');
             const addToCartButtons = document.querySelectorAll('.add-to-cart');
+            const checkoutButton = document.getElementById('checkout');
+            const paymentMethods = document.querySelector('.payment-methods');
+            const confirmPaymentButton = document.getElementById('confirm-payment');
 
             let cartItems = [];
 
@@ -223,10 +248,19 @@
             });
 
             // Checkout
-            const checkoutButton = document.getElementById('checkout');
             checkoutButton.addEventListener('click', function() {
-                // Perform checkout action here (e.g., redirect to checkout page)
-                alert('Redirecting to checkout page...');
+                paymentMethods.style.display = 'block';
+            });
+
+            // Confirm Payment
+            confirmPaymentButton.addEventListener('click', function() {
+                const selectedPaymentMethod = document.querySelector('input[name="payment-method"]:checked');
+                if (selectedPaymentMethod) {
+                    alert(`Confirmed payment with ${selectedPaymentMethod.value}`);
+                    // Additional actions related to payment confirmation can be added here
+                } else {
+                    alert('Please select a payment method.');
+                }
             });
         });
     </script>
