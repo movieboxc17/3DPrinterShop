@@ -166,15 +166,20 @@
             function updateCartDisplay() {
                 cartItemsList.innerHTML = '';
                 let total = 0;
-                cartItems.forEach((item, index) => {
+                const cartItemCounts = {};
+                cartItems.forEach((item) => {
+                    cartItemCounts[item.name] = (cartItemCounts[item.name] || 0) + 1;
+                });
+                Object.entries(cartItemCounts).forEach(([name, count]) => {
+                    const item = cartItems.find(item => item.name === name);
                     const li = document.createElement('li');
                     li.classList.add('cart-item');
                     li.innerHTML = `
-                        <span>${item.name} - $${item.price.toFixed(2)}</span>
-                        <span class="cart-item-remove" data-index="${index}">Remove</span>
+                        <span>${name} ${count > 1 ? `(${count})` : ''} - $${(item.price * count).toFixed(2)}</span>
+                        <span class="cart-item-remove" data-name="${name}">Remove</span>
                     `;
                     cartItemsList.appendChild(li);
-                    total += item.price;
+                    total += item.price * count;
                 });
                 cartTotal.textContent = `Total: $${total.toFixed(2)}`;
             }
@@ -202,7 +207,8 @@
             // Remove item from cart
             cartItemsList.addEventListener('click', function(event) {
                 if (event.target.classList.contains('cart-item-remove')) {
-                    const index = parseInt(event.target.getAttribute('data-index'));
+                    const name = event.target.getAttribute('data-name');
+                    const index = cartItems.findIndex(item => item.name === name);
                     cartItems.splice(index, 1);
                     updateCartDisplay();
                     cartButton.textContent = `Cart (${cartItems.length})`;
