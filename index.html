@@ -256,7 +256,13 @@
             confirmPaymentButton.addEventListener('click', function() {
                 const selectedPaymentMethod = document.querySelector('input[name="payment-method"]:checked');
                 if (selectedPaymentMethod) {
-                    alert(`Confirmed payment with ${selectedPaymentMethod.value}`);
+                    if (selectedPaymentMethod.value === 'credit-card') {
+                        // Perform credit card payment
+                        alert('Credit card payment successful!');
+                    } else if (selectedPaymentMethod.value === 'paypal') {
+                        // Perform PayPal payment
+                        alert('PayPal payment successful!');
+                    }
                     // Additional actions related to payment confirmation can be added here
                 } else {
                     alert('Please select a payment method.');
