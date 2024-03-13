@@ -74,6 +74,17 @@
         .button:hover {
             background-color: #7209b7;
         }
+        #cart {
+            display: none;
+        }
+        #cart-items {
+            list-style-type: none;
+            padding: 0;
+        }
+        #cart-total {
+            font-size: 20px;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -82,6 +93,7 @@
         <a href="#">Shop</a>
         <a href="#">About</a>
         <a href="#">Contact</a>
+        <a href="#" id="cart-button">Cart (0)</a>
     </div>
 
     <div class="container">
@@ -92,7 +104,7 @@
                 <div class="item-description">A 3D printed benchy boat made from durable PLA plastic.</div>
                 <div class="item-price">$1.00</div>
                 <div class="item-actions">
-                    <button class="button">Add to Cart</button>
+                    <button class="button add-to-cart" data-name="Benchy Boat" data-price="1.00">Add to Cart</button>
                 </div>
             </div>
         </div>
@@ -100,16 +112,69 @@
         <div class="item">
             <img src="item2.jpg" alt="Item 2">
             <div class="item-info">
-                <div class="item-title">3D Printed </div>
-                <div class="item-description">...</div>
+                <div class="item-title">3D Printed Item 2</div>
+                <div class="item-description">Description for item 2.</div>
                 <div class="item-price">$7.99</div>
                 <div class="item-actions">
-                    <button class="button">Add to Cart</button>
+                    <button class="button add-to-cart" data-name="Item 2" data-price="7.99">Add to Cart</button>
                 </div>
             </div>
         </div>
 
         <!-- More items can be added here -->
     </div>
+
+    <div id="cart" class="container">
+        <h2>Your Shopping Cart</h2>
+        <ul id="cart-items">
+            <!-- Cart items will be added dynamically here -->
+        </ul>
+        <div id="cart-total">Total: $0.00</div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cartButton = document.getElementById('cart-button');
+            const cart = document.getElementById('cart');
+            const cartItemsList = document.getElementById('cart-items');
+            const cartTotal = document.getElementById('cart-total');
+            const addToCartButtons = document.querySelectorAll('.add-to-cart');
+
+            let cartItems = [];
+
+            // Update cart display
+            function updateCartDisplay() {
+                cartItemsList.innerHTML = '';
+                let total = 0;
+                cartItems.forEach(item => {
+                    const li = document.createElement('li');
+                    li.textContent = `${item.name} - $${item.price.toFixed(2)}`;
+                    cartItemsList.appendChild(li);
+                    total += item.price;
+                });
+                cartTotal.textContent = `Total: $${total.toFixed(2)}`;
+            }
+
+            // Show or hide cart
+            cartButton.addEventListener('click', function() {
+                if (cart.style.display === 'none') {
+                    cart.style.display = 'block';
+                    updateCartDisplay();
+                } else {
+                    cart.style.display = 'none';
+                }
+            });
+
+            // Add item to cart
+            addToCartButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const name = this.getAttribute('data-name');
+                    const price = parseFloat(this.getAttribute('data-price'));
+                    cartItems.push({ name, price });
+                    cartButton.textContent = `Cart (${cartItems.length})`;
+                });
+            });
+        });
+    </script>
 </body>
 </html>
