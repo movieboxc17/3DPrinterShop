@@ -105,6 +105,10 @@
             margin-top: 10px;
             text-align: right;
         }
+        #checkout-button {
+            margin-top: 20px;
+            text-align: right;
+        }
     </style>
 </head>
 <body>
@@ -150,6 +154,9 @@
             <!-- Cart items will be added dynamically here -->
         </ul>
         <div id="cart-total">Total: $0.00</div>
+        <div id="checkout-button">
+            <button class="button" id="checkout">Checkout</button>
+        </div>
     </div>
 
     <script>
@@ -213,6 +220,13 @@
                     updateCartDisplay();
                     cartButton.textContent = `Cart (${cartItems.length})`;
                 }
+            });
+
+            // Checkout
+            const checkoutButton = document.getElementById('checkout');
+            checkoutButton.addEventListener('click', function() {
+                // Perform checkout action here (e.g., redirect to checkout page)
+                alert('Redirecting to checkout page...');
             });
         });
     </script>
