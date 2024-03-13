@@ -111,6 +111,7 @@
         }
         #payment-form {
             display: none;
+            margin-top: 20px;
         }
     </style>
 </head>
@@ -164,6 +165,8 @@
 
     <div id="payment-form" class="container">
         <!-- Stripe payment form can be added here -->
+        <div id="card-element"><!--Stripe.js injects the Card Element--></div>
+        <button id="pay-button" class="button">Pay</button>
     </div>
 
     <script src="https://js.stripe.com/v3/"></script>
@@ -176,6 +179,7 @@
             const addToCartButtons = document.querySelectorAll('.add-to-cart');
             const checkoutButton = document.getElementById('checkout');
             const paymentForm = document.getElementById('payment-form');
+            const payButton = document.getElementById('pay-button');
 
             let cartItems = [];
 
@@ -183,65 +187,31 @@
             const stripe = Stripe('your_stripe_publishable_key');
             const elements = stripe.elements();
 
-            // Update cart display
-            function updateCartDisplay() {
-                cartItemsList.innerHTML = '';
-                let total = 0;
-                const cartItemCounts = {};
-                cartItems.forEach((item) => {
-                    cartItemCounts[item.name] = (cartItemCounts[item.name] || 0) + 1;
-                });
-                Object.entries(cartItemCounts).forEach(([name, count]) => {
-                    const item = cartItems.find(item => item.name === name);
-                    const li = document.createElement('li');
-                    li.classList.add('cart-item');
-                    li.innerHTML = `
-                        <span>${name} ${count > 1 ? `(${count})` : ''} - $${(item.price * count).toFixed(2)}</span>
-                        <span class="cart-item-remove" data-name="${name}">Remove</span>
-                    `;
-                    cartItemsList.appendChild(li);
-                    total += item.price * count;
-                });
-                cartTotal.textContent = `Total: $${total.toFixed(2)}`;
-            }
+            // Create an instance of the card Element
+            const card = elements.create('card');
 
-            // Show or hide cart
-            cartButton.addEventListener('click', function() {
-                if (cart.style.display === 'none') {
-                    cart.style.display = 'block';
-                    updateCartDisplay();
+            // Add an instance of the card Element into the `card-element` div
+            card.mount('#card-element');
+
+            // Handle form submission
+            payButton.addEventListener('click', async function(event) {
+                event.preventDefault();
+
+                const { paymentMethod, error } = await stripe.createPaymentMethod({
+                    type: 'card',
+                    card: card,
+                });
+
+                if (error) {
+                    console.error(error);
+                    // Display error to the user
+                    alert(error.message);
                 } else {
-                    cart.style.display = 'none';
+                    console.log(paymentMethod);
+                    // Handle successful payment method creation
+                    // You can send paymentMethod.id to your server for further processing
+                    alert('Payment successful!');
                 }
-            });
-
-            // Add item to cart
-            addToCartButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const name = this.getAttribute('data-name');
-                    const price = parseFloat(this.getAttribute('data-price'));
-                    cartItems.push({ name, price });
-                    cartButton.textContent = `Cart (${cartItems.length})`;
-                });
-            });
-
-            // Remove item from cart
-            cartItemsList.addEventListener('click', function(event) {
-                if (event.target.classList.contains('cart-item-remove')) {
-                    const name = event.target.getAttribute('data-name');
-                    const index = cartItems.findIndex(item => item.name === name);
-                    cartItems.splice(index, 1);
-                    updateCartDisplay();
-                    cartButton.textContent = `Cart (${cartItems.length})`;
-                }
-            });
-
-            // Checkout button event listener
-            checkoutButton.addEventListener('click', function() {
-                paymentForm.style.display = 'block'; // Show payment form
-                // Create a payment form using Stripe Elements
-                const cardElement = elements.create('card');
-                cardElement.mount('#payment-form');
             });
         });
     </script>
